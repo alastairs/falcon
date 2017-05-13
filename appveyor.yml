@@ -1,0 +1,29 @@
+version: 0.1.0.{build}
+pull_requests:
+  do_not_increment_build_number: true
+image: Visual Studio 2017
+configuration: Release
+platform: Any CPU
+assembly_info:
+  patch: false
+before_build:
+- ps: dotnet restore Falcon.sln
+build:
+  project: Falcon.sln
+  publish_nuget: true
+  parallel: true
+  verbosity: minimal
+test:
+  assemblies:
+    only:
+    - Falcon.Tests
+artifacts:
+- path: src\Falcon\bin\$(Configuration)\Falcon.*.nupkg
+  name: NuGet Push
+deploy:
+- provider: NuGet
+  api_key:
+    secure: zDaJNvByu2zSW5cW9tDMVdrsJtoBBzB62jlc14lPxW6INVv3+Cot8hPACMp11Oxu
+  artifact: /.*\.nupkg/
+  on:
+    branch: deploy
